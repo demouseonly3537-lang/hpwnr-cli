@@ -1,0 +1,25 @@
+name: release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross
+      - name: Build Android arm64 full
+        run: cross build --release --target aarch64-linux-android --locked
+      - name: Upload
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/aarch64-linux-android/release/hpwnr
